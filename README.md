@@ -11,4 +11,4 @@ Everything that forms APLib's FrontEnd.
   * Move all sub folders of APLib-ext folder to `DOCUMENT ROOT`  
 
 ## Usage
-  Magic happens if you believe. Believing needs a heart. And **APLib** is.
+  Magic happens if you **believe**. Believing needs a **heart**. And **APLib** is.
