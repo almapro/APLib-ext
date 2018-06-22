@@ -1,5 +1,5 @@
 <?php
-	include __DIR__.'/../core.php';
+	require_once __DIR__.'/../APLib/core.php';
 	\APLib\Core::init();
 	\APLib\Security::run();
 ?>
