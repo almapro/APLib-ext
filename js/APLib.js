@@ -10,11 +10,15 @@ var lastAlertT    = '';
 var lastAlertM    = '';
 var wait          = false;
 function init(){
+	init(1000);
+}
+function init(interval){
+	if(runner != null) clearInterval(runner);
 	runner = setInterval(
 		function(){
 			if(!wait) BackEnd();
 		},
-		1000
+		interval
 	);
 }
 function BackEnd(){
@@ -82,6 +86,9 @@ function FrontEnd(command){
 		}
 	}
 	switch(command.command){
+		case 'interval':
+			init(command.interval);
+			break;
 		case 'update':
 			if($(command.selector).html() != command.html) $(command.selector).html(command.html);
 			break;
