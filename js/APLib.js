@@ -85,10 +85,10 @@ function FrontEnd(command){
 				break;
 		}
 	}
+	if(typeof(command.interval) != 'undefined'){
+		init(command.interval);
+	}
 	switch(command.command){
-		case 'interval':
-			init(command.interval);
-			break;
 		case 'update':
 			if($(command.selector).html() != command.html) $(command.selector).html(command.html);
 			break;
