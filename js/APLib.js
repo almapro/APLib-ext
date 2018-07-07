@@ -9,8 +9,10 @@ var verbose       = false;
 var lastAlertT    = '';
 var lastAlertM    = '';
 var wait          = false;
+var lastInterval  = 0;
 function init(interval){
 	if(interval === undefined) interval = 1000;
+	if(lastInterval == interval) return;
 	if(runner != null) clearInterval(runner);
 	runner = setInterval(
 		function(){
@@ -18,6 +20,7 @@ function init(interval){
 		},
 		interval
 	);
+	lastInterval = interval;
 }
 function BackEnd(data, callback){
 	wait = true;
