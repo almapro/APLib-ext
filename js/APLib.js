@@ -19,19 +19,13 @@ function init(interval){
 		interval
 	);
 }
-function BackEnd(){
-	BackEnd(null, null);
-}
-function BackEnd(data){
-	BackEnd(data, null);
-}
 function BackEnd(data, callback){
 	wait = true;
 	var xmlHTTP = new XMLHttpRequest();
 	xmlHTTP.onreadystatechange = function(){
 		if(xmlHTTP.readyState == 4) wait = false;
 		if(xmlHTTP.readyState == 4 && xmlHTTP.status == 200 && xmlHTTP.responseText != ''){
-			if(typeof(callback) != 'undefined'){
+			if(callback !== undefined){
 				callback(xmlHTTP.responseText);
 				return;
 			}
@@ -45,7 +39,7 @@ function BackEnd(data, callback){
 		}
 	}
 	xmlHTTP.open('POST',location.href);
-	if(data == null){
+	if(data === undefined){
 		data = JSON.stringify(
 			{
 				'command' : 'refresh',
