@@ -9,10 +9,8 @@ var verbose       = false;
 var lastAlertT    = '';
 var lastAlertM    = '';
 var wait          = false;
-function init(){
-	init(1000);
-}
 function init(interval){
+	if(interval === undefined) interval = 1000;
 	if(runner != null) clearInterval(runner);
 	runner = setInterval(
 		function(){
