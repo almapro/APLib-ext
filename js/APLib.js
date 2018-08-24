@@ -174,7 +174,7 @@ function floatingAlert(title, message, placement, type){
 	if(lastAlertT == title && lastAlertM == message) return;
 	lastAlertT = title;
 	lastAlertM = message;
-	if(typeof(placement) == 'undefined' || placement == null) placement = {from: 'bottom', align: 'left'};
+	if(placement === undefined || placement == null) placement = {from: 'bottom', align: 'left'};
 	var alertConfigs = {
 		title: "<strong>" + title + "</strong><BR>",
 		message: message
@@ -201,5 +201,39 @@ function floatingAlert(title, message, placement, type){
 			break;
 	}
 	$.notify(alertConfigs,alertOptions);
+}
+/************/
+/*  Checks  */
+/************/
+
+// Usage:
+//        onKeyDown = onlyNumbers;
+//        onKeyDown = function(e) { onlyNumbers(e); };
+//        onKeyDown={onlyNumbers}   <==  ReactJS
+//
+// Return:
+//        void
+window.onlyNumbers = function(e){
+  if ($.inArray(e.keyCode, [46, 8, 9, 27, 13]) !== -1 ||
+      (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+      (e.keyCode >= 35 && e.keyCode <= 40)) {
+           return;
+  }
+  if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+      e.preventDefault();
+  }
+}
+
+// Usage:
+//        if(isIPAddress(element)) {...}
+//        if(isIPAddress(event))   {...}
+//
+// Return:
+//        boolean
+window.isIPAddress = function(e){
+	var element = (e.target ? e.target : e);
+	var ipv4 = (element.value.match(/\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4}\b/));
+	var ipv6 = (element.value.match(/^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$/));
+	return (ipv4 || ipv6);
 }
 init();
