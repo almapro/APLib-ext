@@ -30,11 +30,11 @@ function BackEnd(data, callback){
 	xmlHTTP.onreadystatechange = function(){
 		if(xmlHTTP.readyState == 4) wait = false;
 		if(xmlHTTP.readyState == 4 && xmlHTTP.status == 200 && xmlHTTP.responseText != ''){
+			if(verbose) console.log(xmlHTTP.responseText);
 			if(callback !== undefined){
 				callback(xmlHTTP.responseText);
 				return;
 			}
-			if(verbose) console.log(xmlHTTP.responseText);
 			try{
 				var data = JSON.parse(xmlHTTP.responseText);
 			}catch(e){
