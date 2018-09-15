@@ -1,15 +1,17 @@
-var frontend      = true;
-var shiftDown     = false;
-var ctrlDown      = false;
-var altDown       = false;
-var runner        = null;
-var extraRunner   = null;
-var extraCommands = [];
-var verbose       = false;
-var lastAlertT    = '';
-var lastAlertM    = '';
-var wait          = false;
-var lastInterval  = 0;
+var frontend           = true;
+var shiftDown          = false;
+var ctrlDown           = false;
+var altDown            = false;
+var runner             = null;
+var extraRunner        = null;
+var extraCommands      = [];
+var verbose            = false;
+var lastAlertT         = '';
+var lastAlertM         = '';
+var wait               = false;
+var lastInterval       = 0;
+window.APLibBackendURL = location.href;
+
 function APLib(interval){
 	if(interval === undefined) interval = 1000;
 	if(lastInterval == interval) return;
@@ -24,7 +26,7 @@ function APLib(interval){
 }
 function BackEnd(data, callback){
 	wait = true;
-	var xmlHTTP = new XMLHttpRequest();
+	var xmlHTTP =  new XMLHttpRequest();
 	xmlHTTP.onreadystatechange = function(){
 		if(xmlHTTP.readyState == 4) wait = false;
 		if(xmlHTTP.readyState == 4 && xmlHTTP.status == 200 && xmlHTTP.responseText != ''){
@@ -41,7 +43,7 @@ function BackEnd(data, callback){
 			FrontEnd(data);
 		}
 	}
-	xmlHTTP.open('POST',location.href);
+	xmlHTTP.open('POST', APLibBackendURL);
 	if(data === undefined){
 		data = JSON.stringify(
 			{
@@ -76,7 +78,7 @@ function FrontEnd(command){
 				// TODO: Impelment captcha
 				break;
 			case 'warning':
-				floatingAlert('Security warning', command.security.message, null, 'warning');
+				notify('Security warning', command.security.message, null, 'warning');
 				break;
 		}
 	}
@@ -90,14 +92,14 @@ function FrontEnd(command){
 		case 'alert':
 			var placement = null;
 			if(typeof(command.placement) != 'undefined') placement = command.placement;
-			floatingAlert(command.title, command.message, placement, command.type);
+			notify(command.title, command.message, placement, command.type);
 			break;
 		case 'disable':
 			if(frontend){
 				console.log("Front-End has been disabled: " + command.reason);
 				var placement = null;
 				if(typeof(command.placement) != 'undefined') placement = command.placement;
-				floatingAlert("Front-End has been disabled", command.reason, placement, 'warning');
+				notify("Front-End has been disabled", command.reason, placement, 'warning');
 				frontend=false;
 			}
 			break;
@@ -106,7 +108,7 @@ function FrontEnd(command){
 				console.log("Front-End has been enabled");
 				var placement = null;
 				if(typeof(command.placement) != 'undefined') placement = command.placement;
-				floatingAlert("Front-End has been enabled", '', placement, 'success');
+				notify("Front-End has been enabled", '', placement, 'success');
 				frontend=true;
 			}
 			break;
@@ -117,7 +119,7 @@ function FrontEnd(command){
 			console.log('Front-End has been terminated: ' + command.reason);
 			var placement = null;
 			if(typeof(command.placement) != 'undefined') placement = command.placement;
-			floatingAlert("Front-End has been terminated", command.reason, placement, 'error');
+			notify("Front-End has been terminated", command.reason, placement, 'error');
 			break;
 		default:
 			for(var i = 0; i < extraCommands.length; i++){
@@ -170,7 +172,7 @@ function scrollToView(element){
 	var scrollHeight = Math.max(element.scrollHeight, element.clientHeight);
 	element.scrollTop = scrollHeight - element.clientHeight;
 }
-function floatingAlert(title, message, placement, type){
+function notify(title, message, placement, type){
 	if(lastAlertT == title && lastAlertM == message) return;
 	lastAlertT = title;
 	lastAlertM = message;
