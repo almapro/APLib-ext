@@ -77,17 +77,51 @@ window.APLib = {
 		}
 	},
 	WebSockets: {
-		create: function(name, URL) {
-			//
+		open: function(name, URL) {
+			var messages                  = (websockets[name]) ? websockets[name].messages : new Array();
+			websockets[name]              = new WebSocket(URL);
+			websockets[name].name         = name;
+			websockets[name].URL          = URL;
+			websockets[name].disconnected = false;
+			websockets[name].closed       = false;
+			websockets[name].messages     = messages;
+			websockets[name].onclose      = function(){
+				this.disconnected = true;
+			}
+			websockets[name].onerror      = function(){
+				APLib.WebSockets.close(this.name);
+				this.closed = false;
+			}
+			websockets[name].onopen       = function(){
+				if(this.messages.length > 0){
+					for (var i = 0; i < this.messages.length; i++) {
+						this.send(JSON.stringify(this.messages[i]));
+					}
+					this.messages = new Array();
+				}
+			}
+			return websockets[name];
 		},
 		get: function(name) {
-			//
+			return websockets[name];
 		},
-		connect: function(name) {
-			//
+		send: function(name, message) {
+			if(websockets[name].disconnected && !websockets[name].closed) {
+				var messages = websockets[name].messages;
+				var exists   = false;
+				messages.forEach(function(msg){
+					if(JSON.stringify(msg) == JSON.stringify(message)) exists = true;
+				});
+				if(!exists) messages.push(message);
+				APLib.WebSockets.open(name, websockets[name].URL);
+				websockets[name].messages = messages;
+			} else if(!websockets[name].closed) {
+				websockets[name].send(JSON.stringify(message));
+			}
 		},
 		close: function(name) {
-			//
+			websockets[name].close();
+			websockets[name].closed = true;
 		}
 	},
 	Jobs: {
