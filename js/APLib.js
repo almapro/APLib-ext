@@ -78,11 +78,12 @@ window.APLib = {
 	},
 	WebSockets: {
 		open: function(name, URL) {
+			if(websockets[name] && !websockets[name].disconnected) return websockets[name];
 			var messages                  = (websockets[name]) ? websockets[name].messages : new Array();
 			websockets[name]              = new WebSocket(URL);
 			websockets[name].name         = name;
 			websockets[name].URL          = URL;
-			websockets[name].disconnected = false;
+			websockets[name].disconnected = true;
 			websockets[name].closed       = false;
 			websockets[name].messages     = messages;
 			websockets[name].onclose      = function(){
@@ -93,6 +94,7 @@ window.APLib = {
 				this.closed = false;
 			}
 			websockets[name].onopen       = function(){
+				this.disconnected = false;
 				if(this.messages.length > 0){
 					for (var i = 0; i < this.messages.length; i++) {
 						this.send(JSON.stringify(this.messages[i]));
@@ -106,22 +108,33 @@ window.APLib = {
 			return websockets[name];
 		},
 		send: function(name, message) {
-			if(websockets[name].disconnected && !websockets[name].closed) {
-				var messages = websockets[name].messages;
-				var exists   = false;
-				messages.forEach(function(msg){
-					if(JSON.stringify(msg) == JSON.stringify(message)) exists = true;
-				});
-				if(!exists) messages.push(message);
+			if(websockets[name].readyState == 0) {
+				APLib.WebSockets.appendMessage(name, message);
+			} else if(websockets[name].disconnected && !websockets[name].closed) {
+				APLib.WebSockets.appendMessage(name, message);
 				APLib.WebSockets.open(name, websockets[name].URL);
-				websockets[name].messages = messages;
 			} else if(!websockets[name].closed) {
+				if(websockets[name].messages.length > 0){
+					for (var i = 0; i < websockets[name].messages.length; i++) {
+						websockets[name].send(JSON.stringify(websockets[name].messages[i]));
+					}
+					websockets[name].messages = new Array();
+				}
 				websockets[name].send(JSON.stringify(message));
 			}
 		},
 		close: function(name) {
 			websockets[name].close();
 			websockets[name].closed = true;
+		},
+		appendMessage: function(name, message) {
+			var messages = websockets[name].messages;
+			var exists   = false;
+			messages.forEach(function(msg){
+				if(JSON.stringify(msg) == JSON.stringify(message)) exists = true;
+			});
+			if(!exists) messages.push(message);
+			websockets[name].messages = messages;
 		}
 	},
 	Jobs: {
