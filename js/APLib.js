@@ -78,11 +78,12 @@ window.APLib = {
 	},
 	WebSockets: {
 		open: function(name, URL) {
-			if(websockets[name] && !websockets[name].disconnected) return websockets[name];
+			if(websockets[name] && (!websockets[name].disconnected || websockets[name].connecting)) return websockets[name];
 			var messages                  = (websockets[name]) ? websockets[name].messages : new Array();
 			websockets[name]              = new WebSocket(URL);
 			websockets[name].name         = name;
 			websockets[name].URL          = URL;
+			websockets[name].connecting   = true;
 			websockets[name].disconnected = true;
 			websockets[name].closed       = false;
 			websockets[name].messages     = messages;
@@ -95,6 +96,7 @@ window.APLib = {
 			}
 			websockets[name].onopen       = function(){
 				this.disconnected = false;
+				this.connecting   = false;
 				if(this.messages.length > 0){
 					for (var i = 0; i < this.messages.length; i++) {
 						this.send(JSON.stringify(this.messages[i]));
