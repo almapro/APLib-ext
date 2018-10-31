@@ -83,18 +83,22 @@ window.APLib = {
 			websockets[name]              = new WebSocket(URL);
 			websockets[name].name         = name;
 			websockets[name].URL          = URL;
+			websockets[name].connected    = false;
 			websockets[name].connecting   = true;
 			websockets[name].disconnected = true;
 			websockets[name].closed       = false;
 			websockets[name].messages     = messages;
 			websockets[name].onclose      = function(){
 				this.disconnected = true;
+				this.connecting   = false;
+				this.connected    = false;
 			}
 			websockets[name].onerror      = function(){
 				APLib.WebSockets.close(this.name);
 				this.closed = false;
 			}
 			websockets[name].onopen       = function(){
+				this.connected    = true;
 				this.disconnected = false;
 				this.connecting   = false;
 				if(this.messages.length > 0){
@@ -110,12 +114,12 @@ window.APLib = {
 			return websockets[name];
 		},
 		send: function(name, message) {
-			if(websockets[name].readyState == 0) {
+			if(websockets[name].connecting) {
 				APLib.WebSockets.appendMessage(name, message);
-			} else if(websockets[name].disconnected && !websockets[name].closed) {
+			} else if(websockets[name].disconnected) {
 				APLib.WebSockets.appendMessage(name, message);
 				APLib.WebSockets.open(name, websockets[name].URL);
-			} else if(!websockets[name].closed) {
+			} else if(websockets[name].connected) {
 				if(websockets[name].messages.length > 0){
 					for (var i = 0; i < websockets[name].messages.length; i++) {
 						websockets[name].send(JSON.stringify(websockets[name].messages[i]));
